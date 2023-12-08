@@ -12,4 +12,5 @@ public interface UserDao  {
     void addUser(UserModel user);
 
     UserModel getUserByCredentials(UserModel user);
+
 }
