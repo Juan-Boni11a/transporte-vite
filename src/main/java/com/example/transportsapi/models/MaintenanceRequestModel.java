@@ -89,6 +89,21 @@ public class MaintenanceRequestModel {
     @Column(name = "barCode")
     private String barCode;
 
+    @Getter @Setter
+    @Column(name = "lat")
+    private double lat;
+
+    @Getter @Setter
+    @Column(name = "lon")
+    private double lon;
+
+    @Getter @Setter
+    @Column(name = "tipo_combustible")
+    private String tipoCombustible;
+
+    @Getter @Setter
+    @Column(name = "hora_request")
+    private LocalTime horaRequest;
 
     @Getter @Setter
     @ManyToMany(

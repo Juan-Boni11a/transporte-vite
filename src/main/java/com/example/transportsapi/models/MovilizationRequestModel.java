@@ -106,4 +106,28 @@ public class MovilizationRequestModel {
     @Column(name="comments")
     private String comments;
 
+    @Getter @Setter
+    @Column(name = "latDeparture")
+    private double latDeparture;
+
+    @Getter @Setter
+    @Column(name = "longDeparture")
+    private double longDeparture;
+
+    @Getter @Setter
+    @Column(name = "latArrival")
+    private double latArrival;
+
+    @Getter @Setter
+    @Column(name = "longArrival")
+    private double longArrival;
+
+    @Getter @Setter
+    @Column(name = "hourArrival")
+    private LocalTime hourArrival;
+
+    @Getter
+    @Setter
+    @Column(name = "dateArrival")
+    private LocalDate dateArrival;
 }
