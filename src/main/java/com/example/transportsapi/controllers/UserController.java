@@ -54,4 +54,12 @@ public class UserController {
         return user;
     }
 
+    @RequestMapping(value="api/users/{userId}/roles/{roleId}", method = RequestMethod.POST)
+    public UserModel addRoleToUser(@PathVariable  Long userId, @PathVariable Long roleId) {
+        return userService.addRoleToUser(userId, roleId);
+    }
+
+
+
+
 }
