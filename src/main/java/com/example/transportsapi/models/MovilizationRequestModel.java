@@ -108,19 +108,19 @@ public class MovilizationRequestModel {
 
     @Getter @Setter
     @Column(name = "latDeparture")
-    private double latDeparture;
+    private Double latDeparture;
 
     @Getter @Setter
     @Column(name = "longDeparture")
-    private double longDeparture;
+    private Double longDeparture;
 
     @Getter @Setter
     @Column(name = "latArrival")
-    private double latArrival;
+    private Double latArrival;
 
     @Getter @Setter
     @Column(name = "longArrival")
-    private double longArrival;
+    private Double longArrival;
 
     @Getter @Setter
     @Column(name = "hourArrival")

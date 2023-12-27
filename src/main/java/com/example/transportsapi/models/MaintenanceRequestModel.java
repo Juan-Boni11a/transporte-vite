@@ -91,11 +91,11 @@ public class MaintenanceRequestModel {
 
     @Getter @Setter
     @Column(name = "lat")
-    private double lat;
+    private Double lat;
 
     @Getter @Setter
     @Column(name = "lon")
-    private double lon;
+    private Double lon;
 
     @Getter @Setter
     @Column(name = "tipo_combustible")
