@@ -120,5 +120,10 @@ public class MaintenanceRequestModel {
     private Set<ActivityModel> activities;
 
 
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "requester_id")
+    private UserModel requester;
 
 }

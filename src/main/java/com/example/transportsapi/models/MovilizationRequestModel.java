@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,6 +14,7 @@ import java.time.LocalTime;
 @Table(name="movilization_requests")
 @ToString
 @EqualsAndHashCode
+@DynamicUpdate
 public class MovilizationRequestModel {
 
     @Id
@@ -130,4 +132,10 @@ public class MovilizationRequestModel {
     @Setter
     @Column(name = "dateArrival")
     private LocalDate dateArrival;
+
+    @Getter
+    @Setter
+    @ManyToOne
+    @JoinColumn(name = "requester_id")
+    private UserModel requester;
 }

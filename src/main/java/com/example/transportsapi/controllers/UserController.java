@@ -31,7 +31,7 @@ public class UserController {
 
     @RequestMapping(value="api/users", method = RequestMethod.GET)
     public List<UserModel> getUsers(@RequestHeader(value = "Authorization") String token) {
-        if(!verifyToken(token)) { return null; }
+        System.out.println("HOLAAA");
         return userService.getAllUsers();
     }
 

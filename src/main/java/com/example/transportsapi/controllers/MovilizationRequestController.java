@@ -2,9 +2,11 @@ package com.example.transportsapi.controllers;
 
 import com.example.transportsapi.models.MovilizationRequestModel;
 import com.example.transportsapi.service.MovilizationRequestService;
+import com.itextpdf.text.DocumentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -20,8 +22,13 @@ public class MovilizationRequestController {
         return movilizationRequestService.getAllMovilizationRequests();
     }
 
+    @RequestMapping(value = "api/movilizationRequestsByRequester/{id}", method = RequestMethod.GET)
+    public List<MovilizationRequestModel> getByRequester(@PathVariable Long id) {
+        return movilizationRequestService.getMovilizationRequestsByRequester(id);
+    }
+
     @RequestMapping(value = "api/movilizationRequests", method = RequestMethod.POST)
-    public MovilizationRequestModel create(@RequestBody MovilizationRequestModel movilizationRequest) {
+    public MovilizationRequestModel create(@RequestBody MovilizationRequestModel movilizationRequest) throws DocumentException, IOException {
         return movilizationRequestService.createMovilizationRequest(movilizationRequest);
     }
 
