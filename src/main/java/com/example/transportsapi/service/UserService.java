@@ -39,4 +39,8 @@ public class UserService {
         return user;
     }
 
+    public List<UserModel> getUsersByRoleId(Long roleId) {
+        return userRepository.findByRoleId(roleId);
+    }
+
 }

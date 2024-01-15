@@ -1,11 +1,13 @@
 package com.example.transportsapi.models;
 
+import com.example.transportsapi.service.GenerateCodeService;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,6 +23,9 @@ public class MovilizationRequestModel {
     @Getter @Setter @Column(name="id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Getter @Setter @Column(name = "code")
+    private String code;
 
 
     @Getter
@@ -138,4 +143,6 @@ public class MovilizationRequestModel {
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private UserModel requester;
+
+
 }

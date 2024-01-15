@@ -1,6 +1,7 @@
 package com.example.transportsapi.controllers;
 
 import com.example.transportsapi.models.MaintenanceRequestModel;
+import com.example.transportsapi.models.MovilizationRequestModel;
 import com.example.transportsapi.service.MaintenanceRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,12 @@ public class MaintenanceRequestController {
     @GetMapping
     public List<MaintenanceRequestModel> getAll(){
         return maintenanceRequestService.getAll();
+    }
+
+
+    @GetMapping(value = "/{id}")
+    public List<MaintenanceRequestModel> getByRequester(@PathVariable Long id) {
+        return maintenanceRequestService.getMaintenanceRequestsByRequester(id);
     }
 
     @PostMapping

@@ -61,10 +61,10 @@ public class MailService {
         }
     }
 
-    public String sendDynamic(byte[] pdfBytes) throws IOException {
+    public String sendDynamic(byte[] pdfBytes, String destinyEmail) throws IOException {
         // the sender email should be the same as we used to Create a Single Sender Verification
         Email from = new Email("managementdev90@gmail.com");
-        Email to = new Email("pablotrujilloelo@gmail.com");
+        Email to = new Email(destinyEmail);
 
         Mail mail = new Mail();
 

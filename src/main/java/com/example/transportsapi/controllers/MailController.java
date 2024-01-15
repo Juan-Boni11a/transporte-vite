@@ -37,7 +37,7 @@ public class MailController {
 
         document.add(chunk);
         document.close();
-        return mailService.sendDynamic(byteArrayOutputStream.toByteArray());
+        return mailService.sendDynamic(byteArrayOutputStream.toByteArray(), "pablotrujilloelo@gmail.com");
     }
 
 }

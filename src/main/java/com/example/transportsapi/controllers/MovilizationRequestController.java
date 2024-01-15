@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -33,7 +34,7 @@ public class MovilizationRequestController {
     }
 
     @RequestMapping(value = "api/movilizationRequests/{id}", method = RequestMethod.PUT)
-    public MovilizationRequestModel update(@RequestBody MovilizationRequestModel movilizationRequest, @PathVariable Long id) {
+    public MovilizationRequestModel update(@RequestBody MovilizationRequestModel movilizationRequest, @PathVariable Long id) throws IOException {
         movilizationRequest.setId(id);
         return movilizationRequestService.updateMovilizationRequest(movilizationRequest);
     }
