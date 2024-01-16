@@ -25,6 +25,10 @@ public class MaintenanceRequestModel {
     private Long id;
 
 
+    @Getter @Setter @Column(name = "code")
+    private String code;
+
+
     @Getter
     @Setter
     @ManyToOne
@@ -125,5 +129,18 @@ public class MaintenanceRequestModel {
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private UserModel requester;
+
+
+    @Getter @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private MaintenanceRequestModel.Status status;
+
+    public enum Status {
+        PENDIENTE,
+        ACEPTADA,
+        RECHAZADA,
+        TALLER
+    }
 
 }
