@@ -144,5 +144,17 @@ public class MovilizationRequestModel {
     @JoinColumn(name = "requester_id")
     private UserModel requester;
 
+    @Getter
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private MovilizationRequestModel.Status status;
+
+    public enum Status {
+        PENDING,
+        ACCEPTED,
+        REJECTED
+    }
+
 
 }

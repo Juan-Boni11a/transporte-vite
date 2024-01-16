@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 
@@ -17,4 +18,28 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
             "JOIN RoleModel r ON ur.role.id = r.id " +
             "WHERE r.id = :roleId")
     List<UserModel> findByRoleId(@Param("roleId") Long roleId);
+
+
+
+
+
+    @Query("SELECT u, mr FROM UserModel u " +
+            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
+            "JOIN MovilizationRequestModel mr ON u.id = mr.driver.id " +
+            "WHERE ur.role.id = 3 " +
+            "AND :now >= CONCAT(mr.emitDate, ' ', mr.emitHour) " +
+            "AND :now <= CONCAT(mr.expiryDate, ' ', mr.expiryHour) "
+            )
+    List<Object[]> findBusyDrivers(@Param("now") String now);
+
+
+    @Query("SELECT u, mr FROM UserModel u " +
+            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
+            "LEFT JOIN MovilizationRequestModel mr ON u.id = mr.driver.id " +
+            "WHERE ur.role.id = 3 " +
+            "AND (:now < CONCAT(mr.emitDate, ' ', mr.emitHour) OR :now > CONCAT(mr.expiryDate, ' ', mr.expiryHour) OR mr.id IS NULL)"
+    )
+    List<Object[]> findFreeDrivers(@Param("now") String now);
+
+
 }

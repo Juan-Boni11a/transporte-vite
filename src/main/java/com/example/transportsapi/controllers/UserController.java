@@ -60,6 +60,18 @@ public class UserController {
     }
 
 
+    @RequestMapping(value="api/users/busyDrivers", method = RequestMethod.GET)
+    public List<Object[]> getBusyDrivers() {
+        return userService.getBusyDrivers();
+    }
+
+    @RequestMapping(value="api/users/freeDrivers", method = RequestMethod.GET)
+    public List<Object[]> getFreeDrivers() {
+        return userService.getFreeDrivers();
+    }
+
+
+
 
 
 }

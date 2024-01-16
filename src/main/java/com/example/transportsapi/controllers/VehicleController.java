@@ -35,4 +35,17 @@ public class VehicleController {
     public void delete(@PathVariable Long id){
         vehicleService.delete(id);
     }
+
+    @GetMapping("/free")
+    public List<VehicleModel> getFreeVehicles(){
+        return vehicleService.getFreeVehicles();
+    }
+
+
+    @GetMapping("/busy")
+    public List<VehicleModel> getBusyVehicles(){
+        return vehicleService.getBusyVehicles();
+    }
+
+
 }

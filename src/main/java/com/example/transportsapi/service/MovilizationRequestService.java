@@ -2,8 +2,10 @@ package com.example.transportsapi.service;
 
 
 import com.example.transportsapi.mappers.MovilizationRequestMapper;
+import com.example.transportsapi.models.MovilizationRequestLogs;
 import com.example.transportsapi.models.MovilizationRequestModel;
 import com.example.transportsapi.models.UserModel;
+import com.example.transportsapi.models.VehicleModel;
 import com.example.transportsapi.repository.*;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -22,6 +26,10 @@ public class MovilizationRequestService {
 
     @Autowired
     private MovilizationRequestRepository movilizationRequestRepository;
+
+    @Autowired
+    private MovilizationRequestLogsRepository movilizationRequestLogsRepository;
+
 
     @Autowired
     private UserRepository userRepository;
@@ -90,45 +98,43 @@ public class MovilizationRequestService {
         titleChunk.add("Solicitud de Movilización");
         titleChunk.setSpacingAfter(20);
 
-        Paragraph greeting = new Paragraph();
-        greeting.setFont(greetingFont);
-        greeting.add("Hola administrador! un cliente ha realizado una solicitud de movilización, te dejamos los detalles a continuación: ");
-        greeting.setSpacingAfter(12);
 
 
         PdfPTable table = new PdfPTable(2);
 
+
+        table.addCell("Identificador");
+        table.addCell(movilizationRequestFound.getCode());
+
         table.addCell("Nombre");
-        String requesterName = movilizationRequestModel.getRequester().getName() + " " + movilizationRequestModel.getRequester().getLastname();
+        Optional<UserModel> requester =  userRepository.findById(movilizationRequestFound.getRequester().getId());
+        String requesterName = requester.get().getName() + " " + requester.get().getLastname();
         table.addCell(requesterName);
 
         table.addCell("Fecha de salida");
-        table.addCell(String.valueOf(movilizationRequestModel.getDateArrival()));
+        table.addCell(String.valueOf(movilizationRequestFound.getEmitDate()));
 
 
         table.addCell("Hora de salida");
-        table.addCell(String.valueOf(movilizationRequestModel.getHourArrival()));
+        table.addCell(String.valueOf(movilizationRequestFound.getEmitHour()));
 
         String space = ",";
 
         table.addCell("Punto de salida");
-        String departurePoint = String.valueOf(movilizationRequestModel.getLatDeparture()) + space + String.valueOf(movilizationRequestModel.getLongDeparture()) ;
+        String departurePoint = String.valueOf(movilizationRequestFound.getEmitPlace());
         table.addCell(departurePoint);
 
 
         table.addCell("Punto de llegada");
-        String arrivalPoint = String.valueOf(movilizationRequestModel.getLatArrival()) + space + String.valueOf(movilizationRequestModel.getLongArrival());
+        String arrivalPoint = String.valueOf(movilizationRequestFound.getExpiryPlace());
         table.addCell(arrivalPoint);
 
 
-        Chunk noteChunk = new Chunk("Nota: En Google Maps, ingresar las coordenadas indicadas en los puntos de salida y llegada ", noteFont);
 
 
         try {
             document.add(titleChunk);
-            document.add(greeting);
             document.add(table);
-            document.add(noteChunk);
         } catch (DocumentException e) {
             throw new RuntimeException(e);
         }
@@ -139,8 +145,13 @@ public class MovilizationRequestService {
 
 
         for (UserModel admin: admins) {
-            mailService.sendDynamic(byteArrayOutputStream.toByteArray(), admin.getEmail());
+            mailService.sendDynamic(byteArrayOutputStream.toByteArray(), admin.getEmail(), "Nueva solicitud de movilización", "Ha ingresado una nueva solicitud de movilización, en el archivo adjunto están los detalles!");
         }
+
+        MovilizationRequestLogs movilizationRequestLog = new MovilizationRequestLogs();
+        movilizationRequestLog.setMovilizationRequest(movilizationRequestFound);
+        movilizationRequestLog.setContent("Solicitud creada por: " +  requesterName);
+        movilizationRequestLogsRepository.save(movilizationRequestLog);
 
         return movilizationRequestModel;
     }
@@ -149,27 +160,118 @@ public class MovilizationRequestService {
 
         MovilizationRequestModel movilizationRequestFound = movilizationRequestRepository.findById(movilizationRequest.getId()).orElse(null);
 
-        movilizationRequestFound.setInitiatorId(userRepository.findById(movilizationRequest.getInitiatorId().getId()).orElse(null));
+        List<String> logs = new ArrayList<>();
+
+        if(movilizationRequest.getStatus().name().equals("REJECTED")){
+
+
+            if(!movilizationRequestFound.getStatus().name().equals(movilizationRequest.getStatus().name())){
+                String oldValue = movilizationRequestFound.getStatus().name();
+                String newValue = movilizationRequest.getStatus().name();
+                System.out.println("El estado cambió de " + oldValue + " a " + newValue);
+                logs.add("El estado cambió de " + oldValue + " a " + newValue);
+            }
+
+            movilizationRequestFound.setStatus(movilizationRequest.getStatus());
+            movilizationRequestRepository.save(movilizationRequestFound);
+            String customerEmailSubject = "Solicitud de movilización rechazada";
+            String customerEmailContent = "Lamentamos informar que tu solicitud ha sido rechazada.";
+            mailService.sendDynamicWithoutAtt(movilizationRequestFound.getRequester().getEmail(), customerEmailSubject, customerEmailContent);
+
+            return movilizationRequestFound;
+        }
+
+
+        if(movilizationRequestFound.getCurrentActivity()!= movilizationRequest.getCurrentActivity()){
+            String oldValue = movilizationRequestFound.getCurrentActivity();
+            String newValue = movilizationRequest.getCurrentActivity();
+
+            System.out.println("Actividad actual cambió de " + oldValue + " a " + newValue);
+
+            logs.add("Actividad actual cambió de " + oldValue + " a " + newValue);
+
+            /*
+            MovilizationRequestLogs movilizationRequestLog = new MovilizationRequestLogs();
+            movilizationRequestLog.setMovilizationRequest(movilizationRequestFound);
+            movilizationRequestLog.setContent("Actividad actual cambió de " + oldValue + " a " + newValue);
+            movilizationRequestLogsRepository.save(movilizationRequestLog);
+             */
+        }
+
+
+        UserModel newCurrentResponsible = userRepository.findById(movilizationRequest.getCurrentResponsible().getId()).orElse(null);
+
+        if (movilizationRequestFound.getCurrentResponsible()==null){
+            String newValue = newCurrentResponsible.getName() + " " + newCurrentResponsible.getLastname();
+            logs.add("Responsable actual cambió a " + newValue);
+        }else{
+            UserModel oldCurrentResponsible = userRepository.findById(movilizationRequestFound.getCurrentResponsible().getId()).orElse(null);
+            if(oldCurrentResponsible.getId() != newCurrentResponsible.getId()){
+                String oldValue = oldCurrentResponsible.getName() + " " + oldCurrentResponsible.getLastname();
+                String newValue = newCurrentResponsible.getName() + " " + newCurrentResponsible.getLastname();
+                System.out.println("Responsable actual cambió de " + oldValue + " a " + newValue);
+                logs.add("Responsable actual cambió de " + oldValue + " a " + newValue);
+            }
+        }
+
+
+
+        UserModel newDriver = userRepository.findById(movilizationRequest.getDriver().getId()).orElse(null);
+
+        if(movilizationRequestFound.getDriver()==null){
+            String newValue = newDriver.getName() + " " + newDriver.getLastname();
+            System.out.println("Conductor cambió a " + newValue);
+            logs.add("Conductor cambió a " + newValue);
+        }else{
+            UserModel oldDriver = userRepository.findById(movilizationRequestFound.getDriver().getId()).orElse(null);
+            if(oldDriver.getId() != newDriver.getId()){
+                String oldValue = oldDriver.getName() + " " + oldDriver.getLastname();
+                String newValue = newDriver.getName() + " " + newDriver.getLastname();
+                System.out.println("Conductor cambió de " + oldValue + " a " + newValue);
+                logs.add("Conductor cambió de " + oldValue + " a " + newValue);
+            }
+        }
+
+
+        VehicleModel newVehicle = vehiclesRepository.findById(movilizationRequest.getVehicle().getId()).orElse(null);
+
+        if(movilizationRequestFound.getVehicle()==null){
+            String newValue = newVehicle.getPlate();
+            System.out.println("El vehículo cambió a " + newValue);
+            logs.add("El vehículo cambió a " + newValue);
+        }else{
+            VehicleModel oldVehicle = vehiclesRepository.findById(movilizationRequestFound.getVehicle().getId()).orElse(null);
+            if(oldVehicle.getId() != newVehicle.getId()){
+                String oldValue = oldVehicle.getPlate();
+                String newValue = newVehicle.getPlate();
+                System.out.println("El vehículo cambió de " + oldValue + " a " + newValue);
+                logs.add("El vehículo cambió de " + oldValue + " a " + newValue);
+            }
+        }
+
+
+        if(!movilizationRequestFound.getStatus().name().equals(movilizationRequest.getStatus().name())){
+            String oldValue = movilizationRequestFound.getStatus().name();
+            String newValue = movilizationRequest.getStatus().name();
+            System.out.println("El estado cambió de " + oldValue + " a " + newValue);
+            logs.add("El estado cambió de " + oldValue + " a " + newValue);
+        }
+
         movilizationRequestFound.setCurrentActivity(movilizationRequest.getCurrentActivity());
-        movilizationRequestFound.setCurrentResponsible(userRepository.findById(movilizationRequest.getCurrentResponsible().getId()).orElse(null));
-        movilizationRequestFound.setTo(movilizationToRepository.findById(movilizationRequest.getTo().getId()).orElse(null));
-        movilizationRequestFound.setValidity( movilizationValiditiesRepository.findById(movilizationRequest.getValidity().getId()).orElse(null));
+        movilizationRequestFound.setCurrentResponsible(newCurrentResponsible);
         movilizationRequestFound.setDriver(userRepository.findById(movilizationRequest.getDriver().getId()).orElse(null));
         movilizationRequestFound.setVehicle(vehiclesRepository.findById(movilizationRequest.getVehicle().getId()).orElse(null));
-        movilizationRequestFound.setMovilizationType(  movilizationTypeRepository.findById(movilizationRequest.getMovilizationType().getId()).orElse(null));
-        movilizationRequestFound.setEmitPlace(movilizationRequest.getEmitPlace());
-        movilizationRequestFound.setEmitDate(movilizationRequest.getEmitDate());
-        movilizationRequestFound.setEmitHour(movilizationRequest.getEmitHour());
-        movilizationRequestFound.setExpiryPlace(movilizationRequest.getExpiryPlace());
-        movilizationRequestFound.setExpiryDate(movilizationRequest.getExpiryDate());
-        movilizationRequestFound.setExpiryHour(movilizationRequest.getExpiryHour());
-
-
-        System.out.println(movilizationRequestFound.toString());
-
-
+        movilizationRequestFound.setStatus(movilizationRequest.getStatus());
 
         movilizationRequestRepository.save(movilizationRequestFound);
+
+        for (String log : logs) {
+            System.out.println(log);
+            MovilizationRequestLogs movilizationRequestLog = new MovilizationRequestLogs();
+            movilizationRequestLog.setMovilizationRequest(movilizationRequestFound);
+            movilizationRequestLog.setContent(log);
+            movilizationRequestLogsRepository.save(movilizationRequestLog);
+        }
 
         ByteArrayOutputStream byteArrayOutputStreamAdmin = new ByteArrayOutputStream();
 
@@ -201,13 +303,13 @@ public class MovilizationRequestService {
 
 
 
-        Paragraph greeting = new Paragraph();
-        greeting.setFont(greetingFont);
-        greeting.add("Tu solicitud de movilización ha sido aprobada, a continuación un resumen de la solicitud de movilización: ");
-        greeting.setSpacingAfter(12);
 
 
         PdfPTable table = new PdfPTable(2);
+
+
+        table.addCell("Identificador");
+        table.addCell(movilizationRequestFound.getCode());
 
         table.addCell("Nombre");
         String requesterName = movilizationRequestFound.getRequester().getName() + " " + movilizationRequestFound.getRequester().getLastname();
@@ -315,7 +417,6 @@ public class MovilizationRequestService {
 
 
         try {
-            documentCustomer.add(greeting);
             documentCustomer.add(table);
             documentCustomer.add(vehicleTitle);
             documentCustomer.add(vehicleTable);
@@ -341,14 +442,16 @@ public class MovilizationRequestService {
         documentAdmin.close();
 
 
-
-        mailService.sendDynamic(byteArrayOutputStreamCustomer.toByteArray(), movilizationRequestFound.getRequester().getEmail());
+        String customerEmailSubject = "Solicitud de movilización aprobada";
+        String customerEmailContent = "Nos complace informar que tu solicitud ha sido aprobada, en el adjunto están los detalles!";
+        mailService.sendDynamic(byteArrayOutputStreamCustomer.toByteArray(), movilizationRequestFound.getRequester().getEmail(), customerEmailSubject, customerEmailContent);
 
 
         List<UserModel> admins = userRepository.findByRoleId(1L);
 
         for (UserModel admin: admins) {
-            mailService.sendDynamic(byteArrayOutputStreamAdmin.toByteArray(), admin.getEmail());
+
+            mailService.sendDynamic(byteArrayOutputStreamAdmin.toByteArray(), admin.getEmail(), "Orden de movilización", "Se ha generado una nueva orden de movilización, en el adjunto están los detalles:");
         }
 
         return movilizationRequestFound;

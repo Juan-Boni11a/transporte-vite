@@ -61,19 +61,12 @@ public class MailService {
         }
     }
 
-    public String sendDynamic(byte[] pdfBytes, String destinyEmail) throws IOException {
+    public String sendDynamic(byte[] pdfBytes, String destinyEmail, String emailSubject, String emailContent) throws IOException {
         // the sender email should be the same as we used to Create a Single Sender Verification
         Email from = new Email("managementdev90@gmail.com");
         Email to = new Email(destinyEmail);
-
-        Mail mail = new Mail();
-
-        mail.setFrom(from);
-        mail.setTemplateId("d-959ebf53a60d4531be1032a943eb9921");
-        Personalization personalization = new Personalization();
-        personalization.addDynamicTemplateData("url", "");
-        personalization.addTo(to);
-        mail.addPersonalization(personalization);
+        Content content = new Content("text/plain", emailContent);
+        Mail mail = new Mail(from, emailSubject, to, content);
 
 
         Attachments attachments3 = new Attachments();
@@ -85,6 +78,29 @@ public class MailService {
         attachments3.setDisposition("attachment");
         attachments3.setContentId("Banner");
         mail.addAttachments(attachments3);
+
+        SendGrid sg = new SendGrid("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");
+        Request request = new Request();
+
+        try {
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            Response response = sg.api(request);
+            logger.info(response.getBody());
+            return response.getBody();
+        } catch (IOException ex) {
+            throw ex;
+        }
+    }
+
+    public String sendDynamicWithoutAtt(String destinyEmail, String emailSubject, String emailContent) throws IOException {
+        // the sender email should be the same as we used to Create a Single Sender Verification
+        Email from = new Email("managementdev90@gmail.com");
+        Email to = new Email(destinyEmail);
+        Content content = new Content("text/plain", emailContent);
+        Mail mail = new Mail(from, emailSubject, to, content);
+
 
         SendGrid sg = new SendGrid("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");
         Request request = new Request();

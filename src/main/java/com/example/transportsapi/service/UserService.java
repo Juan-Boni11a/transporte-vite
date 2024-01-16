@@ -2,6 +2,7 @@ package com.example.transportsapi.service;
 
 import com.example.transportsapi.models.RoleModel;
 import com.example.transportsapi.models.UserModel;
+import com.example.transportsapi.models.VehicleModel;
 import com.example.transportsapi.repository.RoleRepository;
 import com.example.transportsapi.repository.UserRepository;
 import jakarta.persistence.EntityManager;
@@ -13,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -41,6 +44,25 @@ public class UserService {
 
     public List<UserModel> getUsersByRoleId(Long roleId) {
         return userRepository.findByRoleId(roleId);
+    }
+
+
+    public List<Object[]> getBusyDrivers() {
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String nowAsString = now.format(formatter);
+
+        return userRepository.findBusyDrivers(nowAsString);
+    }
+
+    public List<Object[]> getFreeDrivers() {
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String nowAsString = now.format(formatter);
+
+        return userRepository.findFreeDrivers(nowAsString);
     }
 
 }
