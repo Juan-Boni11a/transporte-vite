@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,18 @@ public class UserModel {
     private String email;
     @Getter @Setter @Column(name="password")
     private String password;
+
+
+    @Getter @Setter @Column(name="license_type")
+    private String licenseType;
+
+    @Getter
+    @Setter
+    @Column(name = "licence_expiry_date")
+    private LocalDate licenceExpiryDate;
+
+
+
 
     @Getter @Setter
     @ManyToMany(

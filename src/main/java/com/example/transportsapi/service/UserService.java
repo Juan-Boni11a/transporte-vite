@@ -2,15 +2,10 @@ package com.example.transportsapi.service;
 
 import com.example.transportsapi.models.RoleModel;
 import com.example.transportsapi.models.UserModel;
-import com.example.transportsapi.models.VehicleModel;
 import com.example.transportsapi.repository.RoleRepository;
 import com.example.transportsapi.repository.UserRepository;
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +24,15 @@ public class UserService {
 
     public List<UserModel> getAllUsers() {
         return userRepository.findAll();
+    }
+
+
+    public UserModel getById(Integer userId) {
+        return userRepository.findById(Long.valueOf(userId)).orElse(null);
+    }
+
+    public UserModel update(UserModel user) {
+        return userRepository.save(user);
     }
 
     @Transactional
@@ -82,6 +86,8 @@ public class UserService {
 
         return userRepository.findBusyDriversToTable(nowAsString);
     }
+
+
 
 
 }

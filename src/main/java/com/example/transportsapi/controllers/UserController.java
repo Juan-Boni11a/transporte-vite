@@ -61,6 +61,17 @@ public class UserController {
         return userService.addRoleToUser(userId, roleId);
     }
 
+    @RequestMapping(value="api/users/{userId}/driver", method = RequestMethod.PUT)
+    public UserModel addRoleToUser(@PathVariable  Integer userId, @RequestBody UserModel userRequest) {
+        UserModel userFound = userService.getById(userId);
+
+        userFound.setId(Long.valueOf(userId));
+        userFound.setLicenseType(userRequest.getLicenseType());
+        userFound.setLicenceExpiryDate(userRequest.getLicenceExpiryDate());
+
+        return userService.update(userFound);
+    }
+
 
     @RequestMapping(value="api/users/busyDrivers", method = RequestMethod.GET)
     public ResponseEntity<Map<String, List<UserModel>>>  getBusyDrivers() {
