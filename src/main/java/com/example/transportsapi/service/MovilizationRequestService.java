@@ -175,7 +175,7 @@ public class MovilizationRequestService {
             movilizationRequestFound.setStatus(movilizationRequest.getStatus());
             movilizationRequestRepository.save(movilizationRequestFound);
             String customerEmailSubject = "Solicitud de movilización rechazada";
-            String customerEmailContent = "Lamentamos informar que tu solicitud ha sido rechazada.";
+            String customerEmailContent = "Lamentamos informar que tu solicitud con identificador " + movilizationRequestFound.getCode() + " ha sido rechazada";
             mailService.sendDynamicWithoutAtt(movilizationRequestFound.getRequester().getEmail(), customerEmailSubject, customerEmailContent);
 
             return movilizationRequestFound;

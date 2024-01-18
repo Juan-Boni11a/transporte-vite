@@ -47,16 +47,16 @@ public class UserService {
     }
 
 
-    public List<Object[]> getBusyDrivers() {
+    public List<UserModel> getBusyDrivers() {
         LocalDateTime now = LocalDateTime.now();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String nowAsString = now.format(formatter);
-
+        System.out.println(nowAsString);
         return userRepository.findBusyDrivers(nowAsString);
     }
 
-    public List<Object[]> getFreeDrivers() {
+    public List<UserModel> getFreeDrivers() {
         LocalDateTime now = LocalDateTime.now();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -64,5 +64,24 @@ public class UserService {
 
         return userRepository.findFreeDrivers(nowAsString);
     }
+
+    public List<UserModel> getDriversFreeOfMaintenance() {
+        return userRepository.findDriversFreeOfMaintenance();
+    }
+
+    public List<UserModel> getDriversBusyOfMaintenance() {
+        return userRepository.findBusyDriversOfMaintenance();
+    }
+
+
+    public List<Object[]> getDriversInMovilization() {
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String nowAsString = now.format(formatter);
+
+        return userRepository.findBusyDriversToTable(nowAsString);
+    }
+
 
 }

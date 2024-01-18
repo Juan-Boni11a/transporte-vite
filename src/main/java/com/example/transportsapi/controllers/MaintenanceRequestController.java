@@ -1,16 +1,16 @@
 package com.example.transportsapi.controllers;
 
 import com.example.transportsapi.models.MaintenanceRequestModel;
-import com.example.transportsapi.models.MovilizationRequestModel;
-import com.example.transportsapi.models.UserModel;
 import com.example.transportsapi.service.MaintenanceRequestService;
-import com.sun.tools.javac.Main;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 
 @RestController
@@ -34,13 +34,13 @@ public class MaintenanceRequestController {
 
     @PostMapping
     public MaintenanceRequestModel create(@RequestBody MaintenanceRequestModel maintenanceRequest) throws IOException {
-        return maintenanceRequestService.createOrUpdate(maintenanceRequest);
+        return maintenanceRequestService.create(maintenanceRequest);
     }
 
     @PutMapping("/{id}")
     public MaintenanceRequestModel update(@RequestBody MaintenanceRequestModel maintenanceRequest, @PathVariable Long id) throws IOException {
         maintenanceRequest.setId(id);
-        return maintenanceRequestService.createOrUpdate(maintenanceRequest);
+        return maintenanceRequestService.update(maintenanceRequest);
     }
 
     @DeleteMapping("/{id}")
@@ -49,7 +49,15 @@ public class MaintenanceRequestController {
     }
 
     @PostMapping("/{maintenanceRequestId}/activity/{activityId}")
-    public MaintenanceRequestModel addRoleToUser(@PathVariable  Long maintenanceRequestId, @PathVariable Long activityId) {
+    public MaintenanceRequestModel addRoleToUser(@PathVariable  Long maintenanceRequestId, @PathVariable Long activityId) throws IOException {
         return maintenanceRequestService.addActivityToMaintenance(maintenanceRequestId, activityId);
+    }
+
+    @PostMapping("/{maintenanceRequestId}/buildPdf")
+    public ResponseEntity<Map<String, Object>> buildPdf(@PathVariable  Integer maintenanceRequestId) throws IOException {
+        maintenanceRequestService.buildPdf(maintenanceRequestId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", true);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

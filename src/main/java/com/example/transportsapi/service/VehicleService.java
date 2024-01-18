@@ -47,4 +47,8 @@ public class VehicleService {
         return vehiclesRepository.findBusyVehicles(nowAsString);
     }
 
+    public List<VehicleModel> getVehiclesInMaintenance() {
+        return vehiclesRepository.findVehiclesInMaintenance();
+    }
+
 }

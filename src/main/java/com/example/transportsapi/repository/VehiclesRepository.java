@@ -21,6 +21,12 @@ public interface VehiclesRepository extends JpaRepository<VehicleModel, Long> {
     )
     List<VehicleModel> findBusyVehicles(@Param("now") String now);
 
+    @Query( " SELECT v FROM VehicleModel  v" +
+            " LEFT JOIN MaintenanceRequestModel ma ON v.id = ma.vehicle.id " +
+            " WHERE ma.status = 'TALLER'"
+    )
+    List<VehicleModel> findVehiclesInMaintenance();
+
 
     @Query("SELECT v " +
             "FROM VehicleModel v " +
@@ -30,6 +36,12 @@ public interface VehiclesRepository extends JpaRepository<VehicleModel, Long> {
             "WHERE mr.id IS NULL"
     )
     List<VehicleModel> findFreeVehicles(@Param("now") String now);
+
+
+
+
+
+
 
 }
 
