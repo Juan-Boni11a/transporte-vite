@@ -20,7 +20,7 @@ public class VehicleModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter @Setter @Column(name="plate")
+    @Getter @Setter @Column(name="plate", unique = true)
     private String plate;
 
 
