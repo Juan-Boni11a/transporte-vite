@@ -65,4 +65,8 @@ public class UserModel {
     @JoinColumn(name = "role_id", columnDefinition = "INT DEFAULT 2")
     private RoleModel role;
 
+    @Getter @Setter
+    @Column(name = "avatar_url", length = 800, columnDefinition = "VARCHAR(800)")
+    private String avatarUrl;
+
 }
