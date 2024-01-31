@@ -44,7 +44,7 @@ public class UserModel {
 
 
 
-
+    /*
     @Getter @Setter
     @ManyToMany(
             fetch= FetchType.EAGER,
@@ -58,7 +58,11 @@ public class UserModel {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<RoleModel> roles;
+    */
 
-
+    @Getter @Setter
+    @ManyToOne
+    @JoinColumn(name = "role_id", columnDefinition = "INT DEFAULT 2")
+    private RoleModel role;
 
 }

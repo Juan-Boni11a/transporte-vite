@@ -1,7 +1,9 @@
 package com.example.transportsapi.controllers;
 
 import com.example.transportsapi.dao.UserDao;
+import com.example.transportsapi.models.RoleModel;
 import com.example.transportsapi.models.UserModel;
+import com.example.transportsapi.repository.RoleRepository;
 import com.example.transportsapi.repository.UserRepository;
 import com.example.transportsapi.service.UserService;
 import com.example.transportsapi.utils.JWTUtil;
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
 
     @RequestMapping(value="api/users", method = RequestMethod.GET)
@@ -63,11 +69,15 @@ public class UserController {
 
     @RequestMapping(value="api/users/{userId}/driver", method = RequestMethod.PUT)
     public UserModel addRoleToUser(@PathVariable  Integer userId, @RequestBody UserModel userRequest) {
+
         UserModel userFound = userService.getById(userId);
+        RoleModel role = roleRepository.findById(3L).orElseThrow(() -> new EntityNotFoundException("Role not found"));
 
         userFound.setId(Long.valueOf(userId));
+        userFound.setRole(role);
         userFound.setLicenseType(userRequest.getLicenseType());
         userFound.setLicenceExpiryDate(userRequest.getLicenceExpiryDate());
+
 
         return userService.update(userFound);
     }

@@ -39,10 +39,8 @@ public class UserService {
     public UserModel addRoleToUser(Long userId, Long roleId) {
         UserModel user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found"));
         RoleModel role = roleRepository.findById(roleId).orElseThrow(() -> new EntityNotFoundException("Role not found"));
-
-        user.getRoles().add(role);
+        user.setRole(role);
         userRepository.save(user);
-
         return user;
     }
 

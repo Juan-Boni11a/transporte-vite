@@ -15,9 +15,7 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<UserModel, Long> {
 
     @Query("SELECT u FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
-            "JOIN RoleModel r ON ur.role.id = r.id " +
-            "WHERE r.id = :roleId")
+            "WHERE u.role.id = :roleId")
     List<UserModel> findByRoleId(@Param("roleId") Long roleId);
 
 
@@ -25,9 +23,8 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
 
 
     @Query("SELECT u, mr FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
             "JOIN MovilizationRequestModel mr ON u.id = mr.driver.id " +
-            "WHERE ur.role.id = 3 " +
+            "WHERE u.role.id = 3 " +
             "AND :now >= CONCAT(mr.emitDate, ' ', mr.emitHour) " +
             "AND :now <= CONCAT(mr.expiryDate, ' ', mr.expiryHour) "
             )
@@ -35,34 +32,30 @@ public interface UserRepository extends JpaRepository<UserModel, Long> {
 
 
     @Query("SELECT u, mr FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
             "LEFT JOIN MovilizationRequestModel mr ON u.id = mr.driver.id " +
-            "WHERE ur.role.id = 3 " +
+            "WHERE u.role.id = 3 " +
             "AND (:now < CONCAT(mr.emitDate, ' ', mr.emitHour) OR :now > CONCAT(mr.expiryDate, ' ', mr.expiryHour) OR mr.id IS NULL)"
     )
     List<UserModel> findFreeDrivers(@Param("now") String now);
 
 
     @Query( "SELECT u FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
             "JOIN MaintenanceRequestModel ma ON u.id = ma.driver.id " +
-            "WHERE ur.role.id = 3 " +
+            "WHERE u.role.id = 3 " +
             "AND ma.status != 'TALLER'")
     List<UserModel> findDriversFreeOfMaintenance();
 
 
     @Query( "SELECT u FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
             "JOIN MaintenanceRequestModel ma ON u.id = ma.driver.id " +
-            "WHERE ur.role.id = 3 " +
+            "WHERE u.role.id = 3 " +
             "AND ma.status = 'TALLER'")
     List<UserModel> findBusyDriversOfMaintenance();
 
 
     @Query("SELECT u, mr FROM UserModel u " +
-            "JOIN UserRoleModel ur ON u.id = ur.user.id " +
             "JOIN MovilizationRequestModel mr ON u.id = mr.driver.id " +
-            "WHERE ur.role.id = 3 " +
+            "WHERE u.role.id = 3 " +
             "AND :now >= CONCAT(mr.emitDate, ' ', mr.emitHour) " +
             "AND :now <= CONCAT(mr.expiryDate, ' ', mr.expiryHour) "
     )
