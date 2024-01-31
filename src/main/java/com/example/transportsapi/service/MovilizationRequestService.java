@@ -335,9 +335,40 @@ public class MovilizationRequestService {
         table.addCell(movilizationRequestFound.getValidity().getName());
 
 
-        table.addCell("Conductor");
+
+
+        PdfPTable driverTable = new PdfPTable(2);
+
+        Paragraph driverTitle = new Paragraph();
+        driverTitle.setFont(subtitleFont);
+        driverTitle.add("Datos del conductor");
+        driverTitle.setSpacingAfter(12);
+
+        driverTable.addCell("Nombre");
         String driverName = movilizationRequestFound.getDriver().getName() + " " + movilizationRequestFound.getDriver().getLastname();
-        table.addCell(driverName);
+        driverTable.addCell(driverName);
+
+        driverTable.addCell("Cédula de identidad");
+        driverTable.addCell(movilizationRequestFound.getDriver().getCi());
+
+        driverTable.addCell("Número de teléfono");
+        driverTable.addCell(movilizationRequestFound.getDriver().getPhone_number());
+
+        driverTable.addCell("Correo electrónico");
+        driverTable.addCell(movilizationRequestFound.getDriver().getEmail());
+
+        String licenseType = movilizationRequestFound.getDriver().getLicenseType();
+        if(licenseType != null){
+            driverTable.addCell("Tipo de licencia");
+            driverTable.addCell(licenseType);
+        }
+
+        String licenseExpiryDate = String.valueOf(movilizationRequestFound.getDriver().getLicenceExpiryDate());
+        if(licenseExpiryDate != null){
+            driverTable.addCell("Fecha de expiración de licencia");
+            driverTable.addCell(licenseExpiryDate);
+        }
+
 
 
         PdfPTable vehicleTable = new PdfPTable(2);
@@ -420,6 +451,8 @@ public class MovilizationRequestService {
             documentCustomer.add(table);
             documentCustomer.add(vehicleTitle);
             documentCustomer.add(vehicleTable);
+            documentCustomer.add(driverTitle);
+            documentCustomer.add(driverTable);
             documentCustomer.add(emitData);
             documentCustomer.add(emitTable);
             documentCustomer.add(expiryData);
@@ -429,6 +462,8 @@ public class MovilizationRequestService {
             documentAdmin.add(table);
             documentAdmin.add(vehicleTitle);
             documentAdmin.add(vehicleTable);
+            documentAdmin.add(driverTitle);
+            documentAdmin.add(driverTable);
             documentAdmin.add(emitData);
             documentAdmin.add(emitTable);
             documentAdmin.add(expiryData);

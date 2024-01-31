@@ -601,9 +601,10 @@ public class MaintenanceRequestService {
 
         PdfPTable table = new PdfPTable(2);
 
-
+        /*
         table.addCell("Estado");
         table.addCell(maintenanceRequestFound.getStatus().name());
+        */
 
         table.addCell("Identificador");
         table.addCell(maintenanceRequestFound.getCode());
@@ -627,12 +628,6 @@ public class MaintenanceRequestService {
         table.addCell("Responsable actual");
         String currentResponName = responsible.get().getName() + " " + responsible.get().getLastname();
         table.addCell(currentResponName);
-
-
-        Optional<UserModel> driver = userRepository.findById(maintenanceRequestFound.getDriver().getId());
-        table.addCell("Conductor");
-        String currentDriverName = driver.get().getName() + " " + driver.get().getLastname();
-        table.addCell(currentDriverName);
 
 
         table.addCell("Fecha");
@@ -685,6 +680,44 @@ public class MaintenanceRequestService {
         vehicleTable.addCell(vehicle.get().getEnrollment());
 
 
+
+
+        PdfPTable driverTable = new PdfPTable(2);
+
+        Paragraph driverTitle = new Paragraph();
+        driverTitle.setFont(subtitleFont);
+        driverTitle.add("Datos del conductor");
+        driverTitle.setSpacingAfter(12);
+
+        Optional<UserModel> driver = userRepository.findById(maintenanceRequestFound.getDriver().getId());
+
+        driverTable.addCell("Nombre");
+        String currentDriverName = driver.get().getName() + " " + driver.get().getLastname();
+        driverTable.addCell(currentDriverName);
+
+
+        driverTable.addCell("Cédula de identidad");
+        driverTable.addCell(driver.get().getCi());
+
+        driverTable.addCell("Número de teléfono");
+        driverTable.addCell(driver.get().getPhone_number());
+
+        driverTable.addCell("Correo electrónico");
+        driverTable.addCell(driver.get().getEmail());
+
+        String licenseType = driver.get().getLicenseType();
+        if(licenseType != null){
+            driverTable.addCell("Tipo de licencia");
+            driverTable.addCell(licenseType);
+        }
+
+        String licenseExpiryDate = String.valueOf(driver.get().getLicenceExpiryDate());
+        if(licenseExpiryDate != null){
+            driverTable.addCell("Fecha de expiración de licencia");
+            driverTable.addCell(licenseExpiryDate);
+        }
+
+
         PdfPTable signTable = new PdfPTable(2);
 
 
@@ -720,6 +753,10 @@ public class MaintenanceRequestService {
             documentCustomer.add(table);
             documentCustomer.add(vehicleTitle);
             documentCustomer.add(vehicleTable);
+
+            documentCustomer.add(driverTitle);
+            documentCustomer.add(driverTable);
+
             documentCustomer.add(activitiesTitle);
             documentCustomer.add(activitiesTable);
 
@@ -727,6 +764,10 @@ public class MaintenanceRequestService {
             documentAdmin.add(table);
             documentAdmin.add(vehicleTitle);
             documentAdmin.add(vehicleTable);
+
+            documentAdmin.add(driverTitle);
+            documentAdmin.add(driverTable);
+
             documentAdmin.add(activitiesTitle);
             documentAdmin.add(activitiesTable);
             documentAdmin.add(signTable);
@@ -747,7 +788,7 @@ public class MaintenanceRequestService {
         List<UserModel> admins = userRepository.findByRoleId(1L);
 
         for (UserModel admin: admins) {
-            mailService.sendDynamic(byteArrayOutputStreamAdmin.toByteArray(), admin.getEmail(), "Orden de movilización", "Se ha actualizado una orden de mantenimiento, en el adjunto están los detalles:");
+            mailService.sendDynamic(byteArrayOutputStreamAdmin.toByteArray(), admin.getEmail(), "Orden de mantenimiento", "Se ha actualizado una orden de mantenimiento, en el adjunto están los detalles:");
         }
 
 
