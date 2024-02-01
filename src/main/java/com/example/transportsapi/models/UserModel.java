@@ -62,7 +62,7 @@ public class UserModel {
 
     @Getter @Setter
     @ManyToOne
-    @JoinColumn(name = "role_id", columnDefinition = "INT DEFAULT 2")
+    @JoinColumn(name = "role_id", referencedColumnName = "id", columnDefinition = "INT DEFAULT 2")
     private RoleModel role;
 
     @Getter @Setter
