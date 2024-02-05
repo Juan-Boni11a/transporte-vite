@@ -47,7 +47,7 @@ public class MailService {
         mailSettings.setSandboxMode(sandBoxMode);
 
 
-        SendGrid sg = new SendGrid("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");
+        SendGrid sg = new SendGrid("YOUR_API_KEY");
         Request request = new Request();
         try {
             request.setMethod(Method.POST);
@@ -79,7 +79,7 @@ public class MailService {
         attachments3.setContentId("Banner");
         mail.addAttachments(attachments3);
 
-        SendGrid sg = new SendGrid("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");
+        SendGrid sg = new SendGrid("YOUR_API_KEY");
         Request request = new Request();
 
         try {
@@ -102,7 +102,7 @@ public class MailService {
         Mail mail = new Mail(from, emailSubject, to, content);
 
 
-        SendGrid sg = new SendGrid("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");
+       SendGrid sg = new SendGrid("YOUR_API_KEY");
         Request request = new Request();
 
         try {
